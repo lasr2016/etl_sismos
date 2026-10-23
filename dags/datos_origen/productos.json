@@ -1,0 +1,486 @@
+{
+  "status": "ok",
+  "total": 60,
+  "data": [
+    {
+      "sku": "SKU-001",
+      "nombre": "Electrónica modelo 1  ",
+      "categoria": "electronica",
+      "proveedor": "Global Supply",
+      "precio_lista": 318600,
+      "costo_unitario": 256900
+    },
+    {
+      "sku": "SKU-002",
+      "nombre": "Electrónica modelo 2  ",
+      "categoria": "ELECTRONICA",
+      "proveedor": "NorteTech",
+      "precio_lista": 73900,
+      "costo_unitario": 61970
+    },
+    {
+      "sku": "SKU-003",
+      "nombre": "Electrónica modelo 3  ",
+      "categoria": "ELECTRONICA",
+      "proveedor": "Pacífico Import",
+      "precio_lista": 86100,
+      "costo_unitario": 69480
+    },
+    {
+      "sku": "SKU-004",
+      "nombre": "Electrónica modelo 4  ",
+      "categoria": "ELECTRONICA",
+      "proveedor": "Sur Distribuciones",
+      "precio_lista": 271800,
+      "costo_unitario": 225420
+    },
+    {
+      "sku": "SKU-005",
+      "nombre": "Electrónica modelo 5  ",
+      "categoria": "Electronica ",
+      "proveedor": "Global Supply",
+      "precio_lista": 239700,
+      "costo_unitario": 187880
+    },
+    {
+      "sku": "SKU-006",
+      "nombre": "Electrónica modelo 6  ",
+      "categoria": "Electrónica",
+      "proveedor": "Global Supply",
+      "precio_lista": 312900,
+      "costo_unitario": 250720
+    },
+    {
+      "sku": "SKU-007",
+      "nombre": "Electrónica modelo 7  ",
+      "categoria": "electronica",
+      "proveedor": "Sur Distribuciones",
+      "precio_lista": 320200,
+      "costo_unitario": "253500"
+    },
+    {
+      "sku": "SKU-008",
+      "nombre": "Electrónica modelo 8  ",
+      "categoria": "Electronica ",
+      "proveedor": "NorteTech",
+      "precio_lista": 95500,
+      "costo_unitario": 78400
+    },
+    {
+      "sku": "SKU-009",
+      "nombre": "Electrónica modelo 9  ",
+      "categoria": "Electrónica",
+      "proveedor": "Sur Distribuciones",
+      "precio_lista": 157300,
+      "costo_unitario": 126190
+    },
+    {
+      "sku": "SKU-010",
+      "nombre": "Electrónica modelo 10  ",
+      "categoria": "electronica",
+      "proveedor": "Pacífico Import",
+      "precio_lista": 86800,
+      "costo_unitario": 70180
+    },
+    {
+      "sku": "SKU-011",
+      "nombre": "Hogar modelo 1  ",
+      "categoria": "hogar",
+      "proveedor": "NorteTech",
+      "precio_lista": 39500,
+      "costo_unitario": 25010
+    },
+    {
+      "sku": "SKU-012",
+      "nombre": "Hogar modelo 2  ",
+      "categoria": "HOGAR",
+      "proveedor": "Pacífico Import",
+      "precio_lista": 67900,
+      "costo_unitario": 42810
+    },
+    {
+      "sku": "SKU-013",
+      "nombre": "Hogar modelo 3  ",
+      "categoria": "HOGAR",
+      "proveedor": "Andes Trading",
+      "precio_lista": 57100,
+      "costo_unitario": "32200"
+    },
+    {
+      "sku": "SKU-014",
+      "nombre": "Hogar modelo 4  ",
+      "categoria": "hogar",
+      "proveedor": "NorteTech",
+      "precio_lista": 64700,
+      "costo_unitario": 39890
+    },
+    {
+      "sku": "SKU-015",
+      "nombre": "Hogar modelo 5  ",
+      "categoria": "Hogar",
+      "proveedor": "Andes Trading",
+      "precio_lista": 41000,
+      "costo_unitario": 24880
+    },
+    {
+      "sku": "SKU-016",
+      "nombre": "Hogar modelo 6  ",
+      "categoria": "HOGAR",
+      "proveedor": "Sur Distribuciones",
+      "precio_lista": 56100,
+      "costo_unitario": 33500
+    },
+    {
+      "sku": "SKU-017",
+      "nombre": "Hogar modelo 7  ",
+      "categoria": "Hogar",
+      "proveedor": "Sur Distribuciones",
+      "precio_lista": 53700,
+      "costo_unitario": 32510
+    },
+    {
+      "sku": "SKU-018",
+      "nombre": "Hogar modelo 8  ",
+      "categoria": "HOGAR",
+      "proveedor": "Pacífico Import",
+      "precio_lista": 10200,
+      "costo_unitario": 6060
+    },
+    {
+      "sku": "SKU-019",
+      "nombre": "Hogar modelo 9  ",
+      "categoria": "HOGAR",
+      "proveedor": "Andes Trading",
+      "precio_lista": 69400,
+      "costo_unitario": 39790
+    },
+    {
+      "sku": "SKU-020",
+      "nombre": "Hogar modelo 10  ",
+      "categoria": "Hogar",
+      "proveedor": "Sur Distribuciones",
+      "precio_lista": 29100,
+      "costo_unitario": 17930
+    },
+    {
+      "sku": "SKU-021",
+      "nombre": "Moda modelo 1  ",
+      "categoria": "moda",
+      "proveedor": "Global Supply",
+      "precio_lista": 43200,
+      "costo_unitario": 21200
+    },
+    {
+      "sku": "SKU-022",
+      "nombre": "Moda modelo 2  ",
+      "categoria": "MODA ",
+      "proveedor": "NorteTech",
+      "precio_lista": 11100,
+      "costo_unitario": 5090
+    },
+    {
+      "sku": "SKU-023",
+      "nombre": "Moda modelo 3  ",
+      "categoria": "MODA ",
+      "proveedor": "Andes Trading",
+      "precio_lista": 18100,
+      "costo_unitario": 9050
+    },
+    {
+      "sku": "SKU-024",
+      "nombre": "Moda modelo 4  ",
+      "categoria": "Moda",
+      "proveedor": "Pacífico Import",
+      "precio_lista": 32300,
+      "costo_unitario": 15770
+    },
+    {
+      "sku": "SKU-025",
+      "nombre": "Moda modelo 5  ",
+      "categoria": "moda",
+      "proveedor": "Andes Trading",
+      "precio_lista": 28100,
+      "costo_unitario": 12890
+    },
+    {
+      "sku": "SKU-026",
+      "nombre": "Moda modelo 6  ",
+      "categoria": "moda",
+      "proveedor": "Pacífico Import",
+      "precio_lista": 55400,
+      "costo_unitario": 28810
+    },
+    {
+      "sku": "SKU-027",
+      "nombre": "Moda modelo 7  ",
+      "categoria": "MODA ",
+      "proveedor": "Sur Distribuciones",
+      "precio_lista": 48900,
+      "costo_unitario": 25510
+    },
+    {
+      "sku": "SKU-028",
+      "nombre": "Moda modelo 8  ",
+      "categoria": "Moda",
+      "proveedor": "Sur Distribuciones",
+      "precio_lista": 14800,
+      "costo_unitario": 8000
+    },
+    {
+      "sku": "SKU-029",
+      "nombre": "Moda modelo 9  ",
+      "categoria": "moda",
+      "proveedor": "Andes Trading",
+      "precio_lista": 25300,
+      "costo_unitario": 12850
+    },
+    {
+      "sku": "SKU-030",
+      "nombre": "Moda modelo 10  ",
+      "categoria": "moda",
+      "proveedor": "Sur Distribuciones",
+      "precio_lista": 47900,
+      "costo_unitario": 25000
+    },
+    {
+      "sku": "SKU-031",
+      "nombre": "Deportes modelo 1  ",
+      "categoria": "deportes",
+      "proveedor": "Andes Trading",
+      "precio_lista": 76300,
+      "costo_unitario": 50740
+    },
+    {
+      "sku": "SKU-032",
+      "nombre": "Deportes modelo 2  ",
+      "categoria": "Deportes",
+      "proveedor": "Pacífico Import",
+      "precio_lista": 19400,
+      "costo_unitario": 12600
+    },
+    {
+      "sku": "SKU-033",
+      "nombre": "Deportes modelo 3  ",
+      "categoria": "DEPORTES",
+      "proveedor": "Andes Trading",
+      "precio_lista": 25900,
+      "costo_unitario": 17060
+    },
+    {
+      "sku": "SKU-034",
+      "nombre": "Deportes modelo 4  ",
+      "categoria": "deportes",
+      "proveedor": "Sur Distribuciones",
+      "precio_lista": 76000,
+      "costo_unitario": "48240"
+    },
+    {
+      "sku": "SKU-035",
+      "nombre": "Deportes modelo 5  ",
+      "categoria": "deportes",
+      "proveedor": "NorteTech",
+      "precio_lista": 115600,
+      "costo_unitario": "74940"
+    },
+    {
+      "sku": "SKU-036",
+      "nombre": "Deportes modelo 6  ",
+      "categoria": "deportes",
+      "proveedor": "Global Supply",
+      "precio_lista": 66100,
+      "costo_unitario": 42900
+    },
+    {
+      "sku": "SKU-037",
+      "nombre": "Deportes modelo 7  ",
+      "categoria": "DEPORTES",
+      "proveedor": "Pacífico Import",
+      "precio_lista": 64700,
+      "costo_unitario": 40550
+    },
+    {
+      "sku": "SKU-038",
+      "nombre": "Deportes modelo 8  ",
+      "categoria": "deportes",
+      "proveedor": "Global Supply",
+      "precio_lista": 61100,
+      "costo_unitario": 36790
+    },
+    {
+      "sku": "SKU-039",
+      "nombre": "Deportes modelo 9  ",
+      "categoria": "Deportes",
+      "proveedor": "Andes Trading",
+      "precio_lista": 29700,
+      "costo_unitario": 19470
+    },
+    {
+      "sku": "SKU-040",
+      "nombre": "Deportes modelo 10  ",
+      "categoria": "DEPORTES",
+      "proveedor": "NorteTech",
+      "precio_lista": 44500,
+      "costo_unitario": 29630
+    },
+    {
+      "sku": "SKU-041",
+      "nombre": "Juguetes modelo 1  ",
+      "categoria": "juguetes",
+      "proveedor": "Pacífico Import",
+      "precio_lista": 9800,
+      "costo_unitario": "5800"
+    },
+    {
+      "sku": "SKU-042",
+      "nombre": "Juguetes modelo 2  ",
+      "categoria": "Juguetes",
+      "proveedor": "Global Supply",
+      "precio_lista": 30000,
+      "costo_unitario": 16110
+    },
+    {
+      "sku": "SKU-043",
+      "nombre": "Juguetes modelo 3  ",
+      "categoria": "Juguetería",
+      "proveedor": "Pacífico Import",
+      "precio_lista": 19300,
+      "costo_unitario": 11490
+    },
+    {
+      "sku": "SKU-044",
+      "nombre": "Juguetes modelo 4  ",
+      "categoria": "Juguetes",
+      "proveedor": "Andes Trading",
+      "precio_lista": 16500,
+      "costo_unitario": "9790"
+    },
+    {
+      "sku": "SKU-045",
+      "nombre": "Juguetes modelo 5  ",
+      "categoria": "Juguetes",
+      "proveedor": "Global Supply",
+      "precio_lista": 24600,
+      "costo_unitario": 14740
+    },
+    {
+      "sku": "SKU-046",
+      "nombre": "Juguetes modelo 6  ",
+      "categoria": "Juguetes",
+      "proveedor": "Sur Distribuciones",
+      "precio_lista": 45100,
+      "costo_unitario": 26580
+    },
+    {
+      "sku": "SKU-047",
+      "nombre": "Juguetes modelo 7  ",
+      "categoria": "Juguetería",
+      "proveedor": "Pacífico Import",
+      "precio_lista": 39700,
+      "costo_unitario": "22480"
+    },
+    {
+      "sku": "SKU-048",
+      "nombre": "Juguetes modelo 8  ",
+      "categoria": "Juguetes",
+      "proveedor": "Global Supply",
+      "precio_lista": 38600,
+      "costo_unitario": 20310
+    },
+    {
+      "sku": "SKU-049",
+      "nombre": "Juguetes modelo 9  ",
+      "categoria": "juguetes",
+      "proveedor": "Andes Trading",
+      "precio_lista": 10500,
+      "costo_unitario": 6120
+    },
+    {
+      "sku": "SKU-050",
+      "nombre": "Juguetes modelo 10  ",
+      "categoria": "Juguetes",
+      "proveedor": "Andes Trading",
+      "precio_lista": 32000,
+      "costo_unitario": 18800
+    },
+    {
+      "sku": "SKU-051",
+      "nombre": "Alimentos modelo 1  ",
+      "categoria": "alimentos",
+      "proveedor": "Sur Distribuciones",
+      "precio_lista": 12100,
+      "costo_unitario": 9170
+    },
+    {
+      "sku": "SKU-052",
+      "nombre": "Alimentos modelo 2  ",
+      "categoria": "Alimentos",
+      "proveedor": "Andes Trading",
+      "precio_lista": 2200,
+      "costo_unitario": 1540
+    },
+    {
+      "sku": "SKU-053",
+      "nombre": "Alimentos modelo 3  ",
+      "categoria": "ALIMENTOS",
+      "proveedor": "NorteTech",
+      "precio_lista": 3600,
+      "costo_unitario": 2590
+    },
+    {
+      "sku": "SKU-054",
+      "nombre": "Alimentos modelo 4  ",
+      "categoria": "Alimentos",
+      "proveedor": "NorteTech",
+      "precio_lista": 4600,
+      "costo_unitario": 3420
+    },
+    {
+      "sku": "SKU-055",
+      "nombre": "Alimentos modelo 5  ",
+      "categoria": "alimentos",
+      "proveedor": "Global Supply",
+      "precio_lista": 3700,
+      "costo_unitario": 2550
+    },
+    {
+      "sku": "SKU-056",
+      "nombre": "Alimentos modelo 6  ",
+      "categoria": "alimentos",
+      "proveedor": "NorteTech",
+      "precio_lista": 5900,
+      "costo_unitario": 4240
+    },
+    {
+      "sku": "SKU-057",
+      "nombre": "Alimentos modelo 7  ",
+      "categoria": "alimentos",
+      "proveedor": "Andes Trading",
+      "precio_lista": 5700,
+      "costo_unitario": 4300
+    },
+    {
+      "sku": "SKU-058",
+      "nombre": "Alimentos modelo 8  ",
+      "categoria": "ALIMENTOS",
+      "proveedor": "Andes Trading",
+      "precio_lista": 10200,
+      "costo_unitario": 7020
+    },
+    {
+      "sku": "SKU-059",
+      "nombre": "Alimentos modelo 9  ",
+      "categoria": "Alimentos",
+      "proveedor": "Global Supply",
+      "precio_lista": 14600,
+      "costo_unitario": 10620
+    },
+    {
+      "sku": "SKU-060",
+      "nombre": "Alimentos modelo 10  ",
+      "categoria": "ALIMENTOS",
+      "proveedor": "Andes Trading",
+      "precio_lista": 8100,
+      "costo_unitario": 6020
+    }
+  ]
+}
