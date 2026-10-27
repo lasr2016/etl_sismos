@@ -31,9 +31,10 @@ SALIDA.mkdir(exist_ok=True)
 # --- Conexión a PostgreSQL (Lectura desde variables de entorno) ---
 PG_HOST = os.getenv("PGHOST", "localhost")
 PG_PORT = int(os.getenv("PGPORT", "5432"))
-PG_DB = os.getenv("PGDATABASE", "gestion_sismo")
+# Se fuerza explícitamente la base de datos aislada gestion_sismo
+PG_DB = "gestion_sismo"
 PG_USER = os.getenv("PGUSER", "postgres")
-PG_PASSWORD = os.getenv("PGPASSWORD", "54321")
+PG_PASSWORD = os.getenv("PGPASSWORD", "32145678")
 
 def ensure_database_exists():
     """Verifica y crea la base de datos gestion_sismo si no existe conectándose a la base admin 'postgres'."""
