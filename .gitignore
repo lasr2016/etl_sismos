@@ -1,0 +1,29 @@
+# Logs de ejecución de Airflow
+logs/
+*.log
+
+# Archivos temporales de intercambio entre tareas (Airflow TaskFlow / Pickle)
+dags/salida/tmp/
+
+# Python cache y compilados
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Entornos virtuales
+env/
+venv/
+.venv/
+
+# Variables de entorno y secretos locales
+.env
+.env.*
+!.env.example
+
+# IDEs y sistemas operativos
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
