@@ -56,7 +56,7 @@ def dag_02_salud():
         
         dim_salud = _leer("dim_salud")
         # Inserta solo la dimensión salud
-        cargadas = p.load_warehouse(pd.DataFrame(), pd.DataFrame(), dim_salud, pd.DataFrame())
+        cargadas = p.load_warehouse_salud(dim_salud)
         
         duracion = time.time() - t0
         run_id = context.get("run_id", "manual")

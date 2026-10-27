@@ -316,42 +316,62 @@ def check_calidad(fact_sismos: pd.DataFrame, dim_tiempo: pd.DataFrame) -> None:
 # --------------------------------------------------------------------------
 # LOAD (IDEMPOTENTE EN DW)
 # --------------------------------------------------------------------------
-def load_warehouse(dim_tiempo: pd.DataFrame, dim_geo: pd.DataFrame, dim_salud: pd.DataFrame, fact: pd.DataFrame) -> int:
+def load_warehouse_sismos(dim_tiempo: pd.DataFrame, dim_geo: pd.DataFrame, fact: pd.DataFrame) -> int:
+    """Carga dimensiones (tiempo, geografia) y tabla de hechos de sismos en el DW."""
     engine = get_engine()
     with engine.begin() as con:
-        # Cargar dimensiones si no están cargadas
-        dim_tiempo.to_sql("stg_dim_tiempo", con, schema="staging", if_exists="replace", index=False)
-        con.execute(text("""
-            INSERT INTO dw.dim_tiempo (tiempo_id,fecha,anio,mes,dia,trimestre,es_fin_de_semana)
-            SELECT tiempo_id,fecha,anio,mes,dia,trimestre,es_fin_de_semana FROM staging.stg_dim_tiempo
-            ON CONFLICT (tiempo_id) DO NOTHING;
-            """))
-
-        dim_geo.to_sql("stg_dim_geo", con, schema="staging", if_exists="replace", index=False)
-        con.execute(text("""
-            INSERT INTO dw.dim_geografia SELECT * FROM staging.stg_dim_geo
-            ON CONFLICT (zona_id) DO UPDATE SET macro_zona = EXCLUDED.macro_zona;
-        """))
-
-        if not dim_salud.empty:
-            dim_salud.to_sql("stg_salud", con, schema="staging", if_exists="replace", index=False)
+        if not dim_tiempo.empty:
+            dim_tiempo.to_sql("stg_dim_tiempo", con, schema="staging", if_exists="replace", index=False)
             con.execute(text("""
-                INSERT INTO dw.dim_establecimiento (codigo_deis, nombre, tipo, comuna, region)
-                SELECT codigo_deis, nombre, tipo, comuna, region FROM staging.stg_salud
-                ON CONFLICT (codigo_deis) DO NOTHING;
+                INSERT INTO dw.dim_tiempo (tiempo_id,fecha,anio,mes,dia,trimestre,es_fin_de_semana)
+                SELECT tiempo_id,fecha,anio,mes,dia,trimestre,es_fin_de_semana FROM staging.stg_dim_tiempo
+                ON CONFLICT (tiempo_id) DO NOTHING;
             """))
 
-        # Cargar tabla de hechos de forma idempotente con ON CONFLICT
-        fact.to_sql("stg_fact_sismos", con, schema="staging", if_exists="replace", index=False)
+        if not dim_geo.empty:
+            dim_geo.to_sql("stg_dim_geo", con, schema="staging", if_exists="replace", index=False)
+            con.execute(text("""
+                INSERT INTO dw.dim_geografia SELECT * FROM staging.stg_dim_geo
+                ON CONFLICT (zona_id) DO UPDATE SET macro_zona = EXCLUDED.macro_zona;
+            """))
+
+        filas_cargadas = 0
+        if not fact.empty:
+            fact.to_sql("stg_fact_sismos", con, schema="staging", if_exists="replace", index=False)
+            resultado = con.execute(text("""
+                INSERT INTO dw.fact_sismos (sismo_id, tiempo_id, zona_id, fecha_utc, magnitud, profundidad_km, latitud, longitud, lugar)
+                SELECT sismo_id, tiempo_id, zona_id, fecha_utc, magnitud, profundidad_km, latitud, longitud, lugar
+                FROM staging.stg_fact_sismos
+                ON CONFLICT (sismo_id) DO NOTHING;
+            """))
+            filas_cargadas = resultado.rowcount
+    log.info("Carga en dw (sismos) finalizada. Filas insertadas: %d", filas_cargadas)
+    return filas_cargadas
+
+
+def load_warehouse_salud(dim_salud: pd.DataFrame) -> int:
+    """Carga la dimension de establecimientos de salud en el DW."""
+    if dim_salud.empty:
+        return 0
+
+    engine = get_engine()
+    with engine.begin() as con:
+        dim_salud.to_sql("stg_salud", con, schema="staging", if_exists="replace", index=False)
         resultado = con.execute(text("""
-            INSERT INTO dw.fact_sismos (sismo_id, tiempo_id, zona_id, fecha_utc, magnitud, profundidad_km, latitud, longitud, lugar)
-            SELECT sismo_id, tiempo_id, zona_id, fecha_utc, magnitud, profundidad_km, latitud, longitud, lugar
-            FROM staging.stg_fact_sismos
-            ON CONFLICT (sismo_id) DO NOTHING;
+            INSERT INTO dw.dim_establecimiento (codigo_deis, nombre, tipo, comuna, region)
+            SELECT codigo_deis, nombre, tipo, comuna, region FROM staging.stg_salud
+            ON CONFLICT (codigo_deis) DO NOTHING;
         """))
         filas_cargadas = resultado.rowcount
-    log.info("Carga en dw finalizada. Filas insertadas: %d", filas_cargadas)
+    log.info("Carga en dw (salud) finalizada. Filas insertadas: %d", filas_cargadas)
     return filas_cargadas
+
+
+def load_warehouse(dim_tiempo: pd.DataFrame, dim_geo: pd.DataFrame, dim_salud: pd.DataFrame, fact: pd.DataFrame) -> int:
+    """Funcion unificada para ejecucion por CLI o pipeline conjunto."""
+    cargadas_sismos = load_warehouse_sismos(dim_tiempo, dim_geo, fact)
+    cargadas_salud = load_warehouse_salud(dim_salud)
+    return cargadas_sismos + cargadas_salud
 
 # --------------------------------------------------------------------------
 # MART & INDICADORES (KPIS)

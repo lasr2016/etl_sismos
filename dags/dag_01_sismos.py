@@ -69,7 +69,7 @@ def dag_01_sismos():
         fact_sismos = _leer("fact_sismos")
         
         # Carga idempotente en dw
-        cargadas = p.load_warehouse(dim_tiempo, dim_geo, pd.DataFrame(), fact_sismos)
+        cargadas = p.load_warehouse_sismos(dim_tiempo, dim_geo, fact_sismos)
         
         duracion = time.time() - t0
         run_id = context.get("run_id", "manual")
