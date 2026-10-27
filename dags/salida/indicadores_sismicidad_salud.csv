@@ -1,14 +1,14 @@
 anio,mes,macro_zona,total_sismos,magnitud_promedio,sismos_severos,total_hospitales,sismos_por_hospital
-2024,1,Zona Norte,52,4.49,9,1,52.0
-2024,1,Zona Centro-Norte,11,4.62,2,0,11.0
-2024,1,Zona Central,6,4.53,0,1,6.0
-2024,1,Zona Sur,4,4.38,0,1,4.0
-2024,2,Zona Norte,37,4.38,1,1,37.0
-2024,2,Zona Centro-Norte,13,4.55,3,0,13.0
-2024,2,Zona Central,4,4.38,0,1,4.0
-2024,2,Zona Sur,1,3.7,0,1,1.0
-2024,3,Zona Norte,53,4.38,3,1,53.0
-2024,3,Zona Centro-Norte,18,4.23,0,0,18.0
-2024,3,Zona Central,5,4.44,1,1,5.0
-2024,3,Zona Austral,1,4.4,0,1,1.0
-2024,3,Zona Sur,1,3.9,0,1,1.0
+2024,1,Zona Norte,52,4.49,9,148,0.35
+2024,1,Zona Centro-Norte,11,4.62,2,189,0.06
+2024,1,Zona Central,6,4.53,0,887,0.01
+2024,1,Zona Sur,4,4.38,0,1219,0.0
+2024,2,Zona Norte,37,4.38,1,148,0.25
+2024,2,Zona Centro-Norte,13,4.55,3,189,0.07
+2024,2,Zona Central,4,4.38,0,887,0.0
+2024,2,Zona Sur,1,3.7,0,1219,0.0
+2024,3,Zona Norte,53,4.38,3,148,0.36
+2024,3,Zona Centro-Norte,18,4.23,0,189,0.1
+2024,3,Zona Central,5,4.44,1,887,0.01
+2024,3,Zona Austral,1,4.4,0,557,0.0
+2024,3,Zona Sur,1,3.9,0,1219,0.0

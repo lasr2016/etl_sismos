@@ -212,32 +212,34 @@ def extract_usgs_sismos(start_date: str = "2024-01-01", end_date: str = "2024-12
     return features
 
 
-def extract_deis_establecimientos() -> list:
-    """Consume catálogo abierto de establecimientos de salud de Chile."""
-    # Catálogo API CKAN datos.gob.cl / DEIS MINSAL
+def extract_deis_establecimientos(limite: int = 3000) -> list:
+    """Consume catálogo vigente de establecimientos de salud desde datos.gob.cl."""
     url = "https://datos.gob.cl/api/3/action/datastore_search"
-    params = {"resource_id": "060a0a55-13e6-4275-8ec6-36d9346ff080", "limit": 1000}
-    try:
-        res = requests.get(url, params=params, timeout=20)
-        res.raise_for_status()
-        records = res.json().get("result", {}).get("records", [])
-    except Exception as e:
-        log.warning("Fallo al consumir API DEIS en línea (%s). Usando fallback de resiliencia.", e)
-        # Fallback sintético mínimo de resiliencia si la API externa del ministerio cae
-        records = [
-            {"Codigo": "HOSP-01", "Nombre": "Hospital Regional de Antofagasta", "Tipo": "Hospital", "Comuna": "Antofagasta", "Region": "Antofagasta"},
-            {"Codigo": "HOSP-02", "Nombre": "Hospital Regional de Talca", "Tipo": "Hospital", "Comuna": "Talca", "Region": "Maule"},
-            {"Codigo": "HOSP-03", "Nombre": "Hospital Dr. Sotero del Rio", "Tipo": "Hospital", "Comuna": "Puente Alto", "Region": "Metropolitana"},
-            {"Codigo": "HOSP-04", "Nombre": "Hospital Regional de Concepcion", "Tipo": "Hospital", "Comuna": "Concepción", "Region": "Biobío"},
-        ]
+    # Resource ID vigente comprobado
+    resource_id = "2c44d782-3365-44e3-aefb-2c8b8363a1bc"
+    params = {"resource_id": resource_id, "limit": limite}
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    }
 
+    log.info("Consultando DEIS MINSAL en datos.gob.cl (recurso %s)...", resource_id)
+    res = requests.get(url, params=params, headers=headers, timeout=30)
+    res.raise_for_status()
+    data = res.json()
+    records = data.get("result", {}).get("records", [])
+
+    if not records:
+        raise ValueError("La API de datos.gob.cl respondió sin registros.")
+
+    log.info("DEIS: Se extrajeron exitosamente %d establecimientos reales.", len(records))
+
+    # Guardar raw según pauta
     engine = get_engine()
     with engine.begin() as con:
         con.execute(
             text("INSERT INTO raw.deis_establecimientos (payload) VALUES (:payload)"),
             {"payload": json.dumps(records)}
         )
-    log.info("DEIS: %d establecimientos registrados", len(records))
     return records
 
 # --------------------------------------------------------------------------
@@ -294,14 +296,29 @@ def transform_sismos(features: list) -> pd.DataFrame:
     df["zona_id"] = df["latitud"].apply(resolver_zona)
     return df
 
+
 def transform_establecimientos(records: list) -> pd.DataFrame:
+    """Mapea y limpia las columnas oficiales del DEIS."""
     df = pd.DataFrame(records)
-    cols = {"Codigo": "codigo_deis", "Nombre": "nombre", "Tipo": "tipo", "Comuna": "comuna", "Region": "region"}
-    # Normalizar columnas según vengan en mayúscula o minúscula
-    df = df.rename(columns={c: cols.get(c, c.lower()) for c in df.columns})
-    disponibles = [c for c in ["codigo_deis", "nombre", "tipo", "comuna", "region"] if c in df.columns]
-    df = df[disponibles].dropna(subset=["codigo_deis"]).drop_duplicates(subset="codigo_deis")
-    return df
+    if df.empty:
+        return pd.DataFrame(columns=["codigo_deis", "nombre", "tipo", "comuna", "region"])
+
+    # Mapeo directo con los encabezados reales
+    df_out = pd.DataFrame({
+        "codigo_deis": df.get("EstablecimientoCodigo", df.get("_id")).astype(str),
+        "nombre": df.get("EstablecimientoGlosa", "Sin nombre").astype(str).str.strip(),
+        "tipo": df.get("TipoEstablecimientoGlosa", "Establecimiento Salud").astype(str).str.strip(),
+        "comuna": df.get("ComunaGlosa", "Desconocida").astype(str).str.strip(),
+        "region": df.get("RegionGlosa", "Desconocida").astype(str).str.strip(),
+    })
+
+    # Filtrar registros activos o válidos y eliminar duplicados
+    df_out = df_out.dropna(subset=["codigo_deis", "nombre"])
+    df_out = df_out[df_out["codigo_deis"] != ""]
+    df_out = df_out.drop_duplicates(subset=["codigo_deis"])
+
+    log.info("DEIS Transformado: %d establecimientos listos para carga.", len(df_out))
+    return df_out
 
 # --------------------------------------------------------------------------
 # CALIDAD

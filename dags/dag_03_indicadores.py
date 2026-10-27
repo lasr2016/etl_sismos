@@ -10,7 +10,7 @@ SALIDA.mkdir(exist_ok=True)
 @dag(
     dag_id="dag_03_indicadores",
     start_date=datetime(2026, 1, 1),
-    schedule=None,  # O disparado tras dag_01 y dag_02
+    schedule=None,
     catchup=False,
     tags=["mart", "indicadores", "reportes"],
 )
@@ -18,7 +18,10 @@ def dag_03_indicadores():
 
     @task
     def calcular_mart_y_exportar(**context):
+        import matplotlib
+        matplotlib.use("Agg")
         import matplotlib.pyplot as plt
+        import numpy as np
         import pandas as pd
         from sqlalchemy import text
         import etl_sismos_salud as p
@@ -60,16 +63,16 @@ def dag_03_indicadores():
         LEFT JOIN dw.fact_sismos f 
             ON f.tiempo_id = t.tiempo_id AND f.zona_id = g.zona_id
         LEFT JOIN (
-            -- Agrupación de centros de salud por macrozona geográfica
             SELECT 
                 CASE 
-                    WHEN region IN ('Arica y Parinacota', 'Tarapacá', 'Antofagasta', 'Atacama') THEN 'Zona Norte'
+                    WHEN region IN ('Arica Parinacota', 'Arica y Parinacota', 'Tarapacá', 'Antofagasta', 'Atacama') THEN 'Zona Norte'
                     WHEN region IN ('Coquimbo', 'Valparaíso') THEN 'Zona Centro-Norte'
-                    WHEN region IN ('Metropolitana de Santiago', 'Libertador General Bernardo O''Higgins', 'Maule') THEN 'Zona Central'
+                    WHEN region IN ('Metropolitana de Santiago', 'Libertador Gral. B. O''Higgins', 'Libertador General Bernardo O''Higgins', 'Maule') THEN 'Zona Central'
                     WHEN region IN ('Ñuble', 'Biobío', 'La Araucanía', 'Los Ríos') THEN 'Zona Sur'
+                    WHEN region IN ('Los Lagos', 'Aysén del General Carlos Ibañez del Campo', 'Magallanes y de la Antártica Chilena') THEN 'Zona Austral'
                     ELSE 'Zona Austral'
                 END AS macro_zona,
-                COUNT(*) AS total_hosp
+                COUNT(DISTINCT codigo_deis) AS total_hosp
             FROM dw.dim_establecimiento
             GROUP BY 1
         ) h ON g.macro_zona = h.macro_zona
@@ -103,16 +106,38 @@ def dag_03_indicadores():
             """), con)
             kpis.to_csv(SALIDA / "indicadores_sismicidad_salud.csv", index=False)
 
-        # 2. Generar el gráfico explicativo
+        # 2. Generar el gráfico explicativo comparativo (Sismos vs Centros de Salud)
         if not kpis.empty:
-            plt.figure(figsize=(10, 5))
-            resumen_zona = kpis.groupby("macro_zona")["total_sismos"].sum().sort_values()
-            resumen_zona.plot(kind="barh", color="#e65100")
-            plt.title("Total de Sismos Registrados por Macro Zona")
-            plt.xlabel("Cantidad de Eventos")
-            plt.ylabel("Macro Zona")
+            resumen = kpis.groupby("macro_zona").agg({
+                "total_sismos": "sum",
+                "total_hospitales": "max"
+            })
+            
+            orden_zonas = ["Zona Austral", "Zona Sur", "Zona Central", "Zona Centro-Norte", "Zona Norte"]
+            resumen = resumen.reindex([z for z in orden_zonas if z in resumen.index]).fillna(0)
+
+            zonas = resumen.index
+            y = np.arange(len(zonas))
+            alto = 0.35
+
+            fig, ax = plt.subplots(figsize=(10, 6))
+
+            barras_sismos = ax.barh(y - alto/2, resumen["total_sismos"], alto, label="Total Sismos", color="#e65100")
+            barras_salud = ax.barh(y + alto/2, resumen["total_hospitales"], alto, label="Establecimientos Salud (DEIS)", color="#1976d2")
+
+            ax.bar_label(barras_sismos, padding=3, fontsize=9, fontweight="bold")
+            ax.bar_label(barras_salud, padding=3, fontsize=9, fontweight="bold")
+
+            ax.set_title("Vulnerabilidad Sísmica vs. Cobertura de Establecimientos de Salud", fontsize=12, pad=15)
+            ax.set_xlabel("Cantidad de Registros")
+            ax.set_ylabel("Macro Zona")
+            ax.set_yticks(y)
+            ax.set_yticklabels(zonas)
+            ax.legend(loc="lower right")
+            ax.grid(axis="x", linestyle="--", alpha=0.5)
+
             plt.tight_layout()
-            plt.savefig(SALIDA / "grafico_indicadores_sismos.png")
+            plt.savefig(SALIDA / "grafico_indicadores_sismos.png", dpi=300)
             plt.close()
 
         duracion = time.time() - t0
