@@ -31,11 +31,35 @@ SALIDA.mkdir(exist_ok=True)
 # --- Conexión a PostgreSQL (Lectura desde variables de entorno) ---
 PG_HOST = os.getenv("PGHOST", "localhost")
 PG_PORT = int(os.getenv("PGPORT", "5432"))
-PG_DB = os.getenv("PGDATABASE", "gestion2")
+PG_DB = os.getenv("PGDATABASE", "gestion_sismo")
 PG_USER = os.getenv("PGUSER", "postgres")
 PG_PASSWORD = os.getenv("PGPASSWORD", "54321")
 
+def ensure_database_exists():
+    """Verifica y crea la base de datos gestion_sismo si no existe conectándose a la base admin 'postgres'."""
+    admin_url = URL.create(
+        "postgresql+psycopg2",
+        username=PG_USER,
+        password=PG_PASSWORD,
+        host=PG_HOST,
+        port=PG_PORT,
+        database="postgres",
+    )
+    admin_engine = create_engine(admin_url, isolation_level="AUTOCOMMIT")
+    try:
+        with admin_engine.connect() as conn:
+            check_sql = text("SELECT 1 FROM pg_database WHERE datname = :dbname")
+            exists = conn.execute(check_sql, {"dbname": PG_DB}).scalar()
+            if not exists:
+                conn.execute(text(f'CREATE DATABASE "{PG_DB}"'))
+                log.info("Base de datos '%s' creada exitosamente.", PG_DB)
+    except Exception as e:
+        log.warning("No se pudo verificar o crear la base de datos automáticamente (%s). Asegúrate de que exista.", e)
+    finally:
+        admin_engine.dispose()
+
 def get_engine():
+    ensure_database_exists()
     url = URL.create(
         "postgresql+psycopg2",
         username=PG_USER,
@@ -107,7 +131,11 @@ CREATE TABLE IF NOT EXISTS staging.stg_salud (
     nombre VARCHAR(200),
     tipo VARCHAR(100),
     comuna VARCHAR(100),
-    region VARCHAR(100)
+    region VARCHAR(100),
+    latitud NUMERIC(9, 6),
+    longitud NUMERIC(9, 6),
+    estado_funcionamiento VARCHAR(100),
+    nivel_complejidad VARCHAR(100)
 );
 
 CREATE TABLE IF NOT EXISTS staging.stg_fact_sismos (
@@ -145,7 +173,11 @@ CREATE TABLE IF NOT EXISTS dw.dim_establecimiento (
     nombre VARCHAR(200) NOT NULL,
     tipo VARCHAR(100),
     comuna VARCHAR(100),
-    region VARCHAR(100)
+    region VARCHAR(100),
+    latitud NUMERIC(9, 6),
+    longitud NUMERIC(9, 6),
+    estado_funcionamiento VARCHAR(100),
+    nivel_complejidad VARCHAR(100)
 );
 
 -- Capa DW: Hechos
@@ -212,7 +244,7 @@ def extract_usgs_sismos(start_date: str = "2024-01-01", end_date: str = "2024-12
     return features
 
 
-def extract_deis_establecimientos(limite: int = 3000) -> list:
+def extract_deis_establecimientos(limite: int = 6000) -> list:
     """Consume catálogo vigente de establecimientos de salud desde datos.gob.cl."""
     url = "https://datos.gob.cl/api/3/action/datastore_search"
     # Resource ID vigente comprobado
@@ -298,24 +330,39 @@ def transform_sismos(features: list) -> pd.DataFrame:
 
 
 def transform_establecimientos(records: list) -> pd.DataFrame:
-    """Mapea y limpia las columnas oficiales del DEIS."""
+    """Mapea y limpia las columnas oficiales del DEIS con coordenadas y estado de funcionamiento."""
     df = pd.DataFrame(records)
     if df.empty:
-        return pd.DataFrame(columns=["codigo_deis", "nombre", "tipo", "comuna", "region"])
+        return pd.DataFrame(columns=[
+            "codigo_deis", "nombre", "tipo", "comuna", "region",
+            "latitud", "longitud", "estado_funcionamiento", "nivel_complejidad"
+        ])
 
-    # Mapeo directo con los encabezados reales
     df_out = pd.DataFrame({
         "codigo_deis": df.get("EstablecimientoCodigo", df.get("_id")).astype(str),
         "nombre": df.get("EstablecimientoGlosa", "Sin nombre").astype(str).str.strip(),
         "tipo": df.get("TipoEstablecimientoGlosa", "Establecimiento Salud").astype(str).str.strip(),
         "comuna": df.get("ComunaGlosa", "Desconocida").astype(str).str.strip(),
         "region": df.get("RegionGlosa", "Desconocida").astype(str).str.strip(),
+        "latitud": pd.to_numeric(df.get("Latitud"), errors="coerce"),
+        "longitud": pd.to_numeric(df.get("Longitud"), errors="coerce"),
+        "estado_funcionamiento": df.get("EstadoFuncionamiento", "Desconocido").astype(str).str.strip(),
+        "nivel_complejidad": df.get("NivelComplejidadEstabGlosa", "No Aplica").astype(str).str.strip(),
     })
 
-    # Filtrar registros activos o válidos y eliminar duplicados
+    # Filtrar registros válidos y eliminar duplicados por código
     df_out = df_out.dropna(subset=["codigo_deis", "nombre"])
     df_out = df_out[df_out["codigo_deis"] != ""]
     df_out = df_out.drop_duplicates(subset=["codigo_deis"])
+
+    # Exportar reporte de establecimientos vigentes sin coordenadas para auditoría
+    vigentes_sin_coords = df_out[
+        df_out["estado_funcionamiento"].str.lower().str.startswith("vigente") &
+        (df_out["latitud"].isna() | df_out["longitud"].isna())
+    ]
+    if not vigentes_sin_coords.empty:
+        vigentes_sin_coords.to_csv(SALIDA / "establecimientos_sin_coordenadas.csv", index=False)
+        log.warning("DEIS: %d establecimientos vigentes carecen de coordenadas válidas (registrados en salida/establecimientos_sin_coordenadas.csv).", len(vigentes_sin_coords))
 
     log.info("DEIS Transformado: %d establecimientos listos para carga.", len(df_out))
     return df_out
@@ -367,7 +414,7 @@ def load_warehouse_sismos(dim_tiempo: pd.DataFrame, dim_geo: pd.DataFrame, fact:
 
 
 def load_warehouse_salud(dim_salud: pd.DataFrame) -> int:
-    """Carga la dimension de establecimientos de salud en el DW."""
+    """Carga la dimension de establecimientos de salud en el DW de gestion_sismo."""
     if dim_salud.empty:
         return 0
 
@@ -375,12 +422,24 @@ def load_warehouse_salud(dim_salud: pd.DataFrame) -> int:
     with engine.begin() as con:
         dim_salud.to_sql("stg_salud", con, schema="staging", if_exists="replace", index=False)
         resultado = con.execute(text("""
-            INSERT INTO dw.dim_establecimiento (codigo_deis, nombre, tipo, comuna, region)
-            SELECT codigo_deis, nombre, tipo, comuna, region FROM staging.stg_salud
-            ON CONFLICT (codigo_deis) DO NOTHING;
+            INSERT INTO dw.dim_establecimiento (
+                codigo_deis, nombre, tipo, comuna, region, latitud, longitud, estado_funcionamiento, nivel_complejidad
+            )
+            SELECT 
+                codigo_deis, nombre, tipo, comuna, region, latitud, longitud, estado_funcionamiento, nivel_complejidad
+            FROM staging.stg_salud
+            ON CONFLICT (codigo_deis) DO UPDATE SET
+                nombre = EXCLUDED.nombre,
+                tipo = EXCLUDED.tipo,
+                comuna = EXCLUDED.comuna,
+                region = EXCLUDED.region,
+                latitud = EXCLUDED.latitud,
+                longitud = EXCLUDED.longitud,
+                estado_funcionamiento = EXCLUDED.estado_funcionamiento,
+                nivel_complejidad = EXCLUDED.nivel_complejidad;
         """))
         filas_cargadas = resultado.rowcount
-    log.info("Carga en dw (salud) finalizada. Filas insertadas: %d", filas_cargadas)
+    log.info("Carga en dw (salud) finalizada en gestion_sismo. Filas insertadas: %d", filas_cargadas)
     return filas_cargadas
 
 
