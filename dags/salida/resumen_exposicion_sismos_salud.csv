@@ -1,0 +1,6 @@
+macro_zona,total_establecimientos,establecimientos_expuestos,max_magnitud_cercana,pct_expuestos,poblacion,estab_por_100k_hab,radio_km,magnitud_criterio
+Zona Norte,550,106,5.8,19.3,1680000,32.7,50.0,4.5
+Zona Centro-Norte,1028,584,5.8,56.8,2870000,35.8,50.0,4.5
+Zona Central,1875,161,4.8,8.6,10400000,18.0,50.0,4.5
+Zona Sur,1262,126,4.5,10.0,3630000,34.8,50.0,4.5
+Zona Austral,573,0,0.0,0.0,1190000,48.2,50.0,4.5
